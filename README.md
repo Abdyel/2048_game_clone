@@ -1,0 +1,1 @@
+This is a Source Project file for Godot 4+. It is intended to be used by the .Net version of GODOT 4+. Inorder to use code you will need to install a 4.+ Version of GODTO then import project into the GODOT software.
