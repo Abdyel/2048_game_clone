@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Reflection;
+using System.Collections.Generic;
 
 public partial class Grid : Node2D
 {
@@ -11,7 +12,7 @@ public partial class Grid : Node2D
 	public override void _Ready()
 	{
 		sceneTile = ResourceLoader.Load<PackedScene>("res://Tile.tscn");
-		
+
 		grid = new Tile[4,4];
 
 		PopulateStartingTiles();
@@ -20,7 +21,47 @@ public partial class Grid : Node2D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		
+
+	}
+	public override void _Input(InputEvent @event)
+	{
+		if(@event.IsActionPressed("up"))
+		{
+			MoveTiles("up");
+		}
+		if(@event.IsActionPressed("down"))
+		{
+			MoveTiles("down");
+		}
+		if(@event.IsActionPressed("left"))
+		{
+			MoveTiles("left");
+		}
+		if(@event.IsActionPressed("right"))
+		{
+			MoveTiles("right");
+		}
+	}
+
+	private bool MoveTiles(String direction)
+	{
+		GD.Print("MoveTiles() called: " + direction);
+		bool movementOccurred = false;
+
+		bool isHorizontal = direction == "left" || direction == "right";
+		bool isReverse = direction == "up" || direction == "left";
+
+		for(int i = 0; i < 4; i++)
+		{
+			Stack<Tile> tiles = new Stack<Tile>();
+
+			for( int j = 0; j < 4; j++)
+			{
+				
+			}
+		}
+
+		return movementOccurred;
 	}
 
 	private Vector2 ArrayToTileCoords(Vector2 arrayCoords)
@@ -48,7 +89,7 @@ public partial class Grid : Node2D
 		Tile t2 = sceneTile.Instantiate() as Tile; // Loaded in at _On Ready as Tile.tscn creates a Tile node.
 		t2.Position = ArrayToTileCoords(tile2coords);
 		AddChild(t2);
-		
+
 		grid[(int) tile1coords.X, (int) tile1coords.Y] = t1;
 		grid[(int) tile2coords.X, (int) tile2coords.Y] = t2;
 	}
