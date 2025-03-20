@@ -65,34 +65,34 @@ public partial class Grid : Node2D
 					tiles.Push(grid[x,y]);
 					grid[x,y] = null; //clear grid as we go.
 				}
+			}
+			
+			int newIndex = isReverse ? 0 : 3;
 
-				int newIndex = isReverse ? 0 : 3;
+			while (tiles.Count > 0)
+			{
+				Tile current = tiles.Pop();
+				Tile next = tiles.Count > 0 ? tiles.Peek() : null;
+				Tile merged = null;
 
-				while (tiles.Count > 0)
+				//check for merge
+				if(next != null && current.GetValue() == next.GetValue())
 				{
-					Tile current = tiles.Pop();
-					Tile next = tiles.Count > 0 ? tiles.Peek() : null;
-					Tile merged = null;
-
-					//check for merge
-					if(next != null && current.GetValue() == next.GetValue())
-					{
-						merged = tiles.Pop();
-						current.SetValue(current.GetValue() * 2);
-					}
-
-					if(isHorizontal)
-					{
-						grid[newIndex, i] = current;
-					}
-					else
-					{
-						grid[i,newIndex] = current;
-					}
-
-					newIndex += isReverse ? 1 : -1;
-
+					merged = tiles.Pop();
+					current.SetValue(current.GetValue() * 2);
 				}
+
+				if(isHorizontal)
+				{
+					grid[newIndex, i] = current;
+				}
+				else
+				{
+					grid[i,newIndex] = current;
+				}
+				
+			newIndex += isReverse ? 1 : -1;
+			
 			}
 		}
 
