@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 
 public partial class Grid : Node2D
 {
@@ -51,6 +52,8 @@ public partial class Grid : Node2D
 		bool isHorizontal = direction == "left" || direction == "right";
 		bool isReverse = direction == "up" || direction == "left";
 
+		Dictionary<Tile, Vector2> mergeCoords = new Dictionary<Tile, Vector2>();
+
 		for(int i = 0; i < 4; i++)
 		{
 			Stack<Tile> tiles = new Stack<Tile>();
@@ -85,10 +88,18 @@ public partial class Grid : Node2D
 				if(isHorizontal)
 				{
 					grid[newIndex, i] = current;
+					if (merged != null)
+					{
+						mergeCoords.Add(merged, ArrayToTileCoords(new Vector2(newIndex, i)));
+					}
 				}
 				else
 				{
 					grid[i,newIndex] = current;
+					if (merged != null)
+					{
+						mergeCoords.Add(merged, ArrayToTileCoords(new Vector2(i, newIndex)));
+					}
 				}
 				
 			newIndex += isReverse ? 1 : -1;
@@ -109,7 +120,53 @@ public partial class Grid : Node2D
 			}
 		}
 
+		foreach (Tile t in mergeCoords.Keys)
+		{
+			Vector2 coords = mergeCoords[t];
+			Tween tween = t.CreateTween();
+			tween.TweenProperty(t,"position",coords,0.1f);
+			tween.TweenCallback(Callable.From(() => { t.QueueFree(); } ));
+		}
+
 		return movementOccurred;
+	}
+
+	private void SpawnRandomTile()
+	{
+		List<Vector2I> spaces = new List<Vector2I>();
+
+		for (int x = 0; x < 4; x++)
+		{
+			for( int y = 0; y < 4; y++)
+			{
+				if (grid[x,y] == null ){
+					spaces.Add(new Vector2I(x,y));
+				}
+			}
+		} 
+
+		if(spaces.Count > 0)
+		{
+			Random r = new Random();
+			int selection = r.Next (0, spaces.Count);
+			SpawnTile(spaces[selection].X, spaces[selection].Y);
+		}
+	}
+
+	private void SpawnTile(int x, int y)
+	{
+		Random r = new Random();
+
+		Tile newTile = sceneTile.Instantiate() as Tile;
+		newTile.Position = ArrayToTileCoords(new Vector2(x, y));
+
+		int spawn4 = r.Next(0, 10);
+		int value = spawn4 < 7 ? 4 : 2;
+		newTile.SetValue(value);
+
+		grid[x,y] = newTile;
+		AddChild(newTile);
+
 	}
 
 	private Vector2 ArrayToTileCoords(Vector2 arrayCoords)
