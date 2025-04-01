@@ -26,21 +26,28 @@ public partial class Grid : Node2D
 	}
 	public override void _Input(InputEvent @event)
 	{
+		bool moved = false;
+
 		if(@event.IsActionPressed("up"))
 		{
-			MoveTiles("up");
+			moved = MoveTiles("up");
 		}
 		if(@event.IsActionPressed("down"))
 		{
-			MoveTiles("down");
+			moved = MoveTiles("down");
 		}
 		if(@event.IsActionPressed("left"))
 		{
-			MoveTiles("left");
+			moved = MoveTiles("left");
 		}
 		if(@event.IsActionPressed("right"))
 		{
-			MoveTiles("right");
+			moved = MoveTiles("right");
+		}
+
+		if(moved)
+		{
+			SpawnRandomTile();
 		}
 	}
 
@@ -51,6 +58,8 @@ public partial class Grid : Node2D
 
 		bool isHorizontal = direction == "left" || direction == "right";
 		bool isReverse = direction == "up" || direction == "left";
+
+		Dictionary<Tile, Vector2> originalPositions = new Dictionary<Tile, Vector2>();
 
 		Dictionary<Tile, Vector2> mergeCoords = new Dictionary<Tile, Vector2>();
 
@@ -65,6 +74,7 @@ public partial class Grid : Node2D
 				
 				if (grid[x,y] != null)
 				{
+					originalPositions[grid[x, y]] = new Vector2(x,y);
 					tiles.Push(grid[x,y]);
 					grid[x,y] = null; //clear grid as we go.
 				}
@@ -81,6 +91,8 @@ public partial class Grid : Node2D
 				//check for merge
 				if(next != null && current.GetValue() == next.GetValue())
 				{
+					movementOccurred = true;
+
 					merged = tiles.Pop();
 					current.SetValue(current.GetValue() * 2);
 				}
@@ -104,6 +116,16 @@ public partial class Grid : Node2D
 				
 			newIndex += isReverse ? 1 : -1;
 			
+			}
+		}
+
+		foreach (Tile t in originalPositions.Keys)
+		{
+			Vector2 coords = originalPositions[t];
+			if (grid[(int) coords.X, (int) coords.Y] != t)
+			{
+				movementOccurred = true;
+				break;
 			}
 		}
 

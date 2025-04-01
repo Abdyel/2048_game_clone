@@ -9,7 +9,8 @@ public partial class Tile : Polygon2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-
+		PlaySpawnAnimation();
+		UpdateLabel();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -29,6 +30,18 @@ public partial class Tile : Polygon2D
 		UpdateLabel();
 	}
 
+	private void PlaySpawnAnimation()
+	{
+		Scale = new Vector2(0,0); 
+		Position = Position + new Vector2(50, 50);
+
+		Tween scaleAnim = CreateTween();
+		Tween positionAnim = CreateTween();
+
+		scaleAnim.TweenProperty(this,"scale", new Vector2(1,1), 0.2f);
+
+		positionAnim.TweenProperty(this,"position", Position - new Vector2(50,50), 0.2f);
+	}
 	private void UpdateLabel()
 	{
 		label = GetNode<Label>("Label");
